@@ -1,8 +1,198 @@
 {% extends 'base.html' %}
-{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block title %}Register{% endblock %}
 
 {% block content %}
+<style>
+    body {
+        background-color: #f5f7fb;
+    }
 
-    {{wtf.quick_form(form) }}
+    .auth-wrapper {
+        min-height: calc(100vh - 80px);
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding-top: 40px;
+    }
 
+    .auth-container {
+        width: 100%;
+        max-width: 460px;
+        text-align: center;
+    }
+
+    .auth-icon {
+        width: 72px;
+        height: 72px;
+        background: #e8f0ff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 24px;
+    }
+
+    .auth-icon svg {
+        width: 38px;
+        height: 38px;
+        stroke: #2563eb;
+    }
+
+    .auth-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 10px;
+    }
+
+    .auth-subtitle {
+        color: #64748b;
+        margin-bottom: 32px;
+        font-size: 1.05rem;
+    }
+
+    .auth-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        padding: 28px;
+        text-align: left;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    }
+
+    .card-heading {
+        font-size: 1.35rem;
+        font-weight: 700;
+        margin-bottom: 4px;
+        color: #111827;
+    }
+
+    .card-subheading {
+        color: #6b7280;
+        margin-bottom: 24px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        height: 48px;
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+        background-color: #f8fafc;
+        padding: 0 14px;
+        margin-bottom: 18px;
+    }
+
+    .form-control:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.15);
+    }
+
+    .btn-register {
+        width: 100%;
+        height: 48px;
+        border: none;
+        border-radius: 10px;
+        background: #020617;
+        color: white;
+        font-weight: 600;
+        margin-top: 8px;
+        transition: 0.2s;
+    }
+
+    .btn-register:hover {
+        background: #111827;
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 22px;
+        color: #6b7280;
+    }
+
+    .auth-footer a {
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .demo-box {
+        margin-top: 22px;
+        background: #eff6ff;
+        color: #475569;
+        border-radius: 12px;
+        padding: 14px;
+        font-size: 0.92rem;
+        text-align: center;
+    }
+
+    .demo-box span {
+        margin-right: 6px;
+    }
+</style>
+
+<div class="auth-wrapper">
+    <div class="auth-container">
+
+        <div class="auth-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                 stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M12 3l7 4v5c0 5-3.5 7.5-7 9-3.5-1.5-7-4-7-9V7l7-4z"/>
+            </svg>
+        </div>
+
+        <h1 class="auth-title">Create Account</h1>
+        <p class="auth-subtitle">Join us to start authenticating banknotes</p>
+
+        <div class="auth-card">
+            <div class="card-heading">Register</div>
+            <div class="card-subheading">Create your account to get started</div>
+
+            <form method="POST">
+                {{ form.hidden_tag() }}
+
+                <div class="mb-3">
+                    {{ form.username.label(class="form-label") }}
+                    {{ form.username(class="form-control", placeholder="John Doe") }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.email.label(class="form-label") }}
+                    {{ form.email(class="form-control", placeholder="you@example.com") }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.password.label(class="form-label") }}
+                    {{ form.password(class="form-control", placeholder="••••••••") }}
+                </div>
+
+                {% if form.confirm_password %}
+                <div class="mb-3">
+                    {{ form.confirm_password.label(class="form-label") }}
+                    {{ form.confirm_password(class="form-control", placeholder="••••••••") }}
+                </div>
+                {% endif %}
+
+                <button type="submit" class="btn-register">
+                    Create Account
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                Already have an account?
+                <a href="{{ url_for('auth.login') }}">Login here</a>
+            </div>
+
+            <div class="demo-box">
+                <span>💡</span> Demo: Use any information to create an account
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
