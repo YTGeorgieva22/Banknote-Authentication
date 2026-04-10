@@ -1,10 +1,97 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-</body>
-</html>
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+<section class="hero-section">
+    <div class="hero-icon">
+    <img src="{{ url_for('static', filename='logo.png') }}"
+         alt="Shield Logo"
+         class="shield-logo">
+</div>
+
+    <h1>Banknote Authentication System</h1>
+    <p class="hero-text">
+        Leveraging machine learning and logistic regression to detect counterfeit
+        currency with precision and reliability
+    </p>
+
+    <div class="hero-buttons">
+        <a href="#" class="btn-primary">
+            Get Started <span>&rarr;</span>
+        </a>
+        <a href="#" class="btn-secondary">Learn More</a>
+    </div>
+</section>
+
+<section class="features-section">
+    <h2>Key Features</h2>
+
+<div class="feature-cards">
+    <div class="feature-card blue-card">
+        <div class="feature-icon blue">
+            <i class="fas fa-brain"></i>
+        </div>
+        <h3>Machine Learning</h3>
+        <p>
+            Advanced logistic regression algorithm trained on real banknote features
+        </p>
+    </div>
+
+    <div class="feature-card green-card">
+        <div class="feature-icon green">
+            <i class="fas fa-lock"></i>
+        </div>
+        <h3>High Accuracy</h3>
+        <p>
+            Reliable detection with optimized parameters and extensive validation
+        </p>
+    </div>
+
+    <div class="feature-card purple-card">
+        <div class="feature-icon purple">
+            <i class="fas fa-chart-line"></i>
+        </div>
+        <h3>Real-time Analysis</h3>
+        <p>
+            Instant predictions with detailed probability scores and metrics
+        </p>
+    </div>
+</div>
+
+</section>
+
+<section class="algorithm-section">
+    <div class="algorithm-card">
+        <h2>Logistic Regression Algorithm</h2>
+        <p class="subtitle">
+            Our system uses logistic regression, a powerful statistical method for binary classification
+        </p>
+
+        <div class="algorithm-grid">
+            <div>
+                <h3>How It Works</h3>
+                <ul>
+                    <li>Extracts key features from banknote images</li>
+                    <li>Processes variance, skewness, curtosis, and entropy</li>
+                    <li>Applies sigmoid function for probability calculation</li>
+                    <li>Classifies as authentic or counterfeit</li>
+                </ul>
+            </div>
+
+            <div>
+                <h3>Key Benefits</h3>
+                <ul>
+                    <li>Fast and efficient processing</li>
+                    <li>Interpretable results and weights</li>
+                    <li>Scalable to large datasets</li>
+                    <li>Continuous improvement through training</li>
+                </ul>
+            </div>
+        </div>
+
+        <a href="#" class="btn-secondary dataset-btn">
+            Learn About Our Dataset
+        </a>
+    </div>
+</section>
+{% endblock %}
