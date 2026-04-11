@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+
+<section class="dashboard-wrapper">
+
+    <div class="dashboard-header">
+        <div class="dashboard-header-icon">
+            <i class="fas fa-anchor"></i>
+        </div>
+
+        <div>
+            <h1>Welcome back, {{current_user.username if current_user.username else current_user.email}}!</h1>
+            <p>
+                Here's an overview of your Titanic survival prediction activities
+            </p>
+        </div>
+    </div>
+
+    <section class="stats-grid">
+
+        <div class="stat-card">
+            <div class="stat-top">
+                <span>Total Predictions</span>
+
+                {% if total_predictions_change is defined and total_predictions_change %}
+                    <small class="badge blue">
+                        {{ total_predictions_change }}
+                    </small>
+                {% endif %}
+            </div>
+
+            <h2>{{ total_predictions if total_predictions is defined else 0 }}</h2>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-top">
+                <span>Model Accuracy</span>
+
+                {% if model_accuracy_change is defined and model_accuracy_change %}
+                    <small class="badge teal">
+                        {{ model_accuracy_change }}
+                    </small>
+                {% endif %}
+            </div>
+
+            <h2>
+                {% if model_accuracy is defined and model_accuracy is not none %}
+                    {{ "%.1f"|format(model_accuracy) }}%
+                {% else %}
+                    --
+                {% endif %}
+            </h2>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-top">
+                <span>Models Trained</span>
+
+                {% if models_trained is defined and models_trained > 0 %}
+                    <small class="badge purple">New</small>
+                {% endif %}
+            </div>
+
+            <h2>{{ models_trained if models_trained is defined else 0 }}</h2>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-top">
+                <span>Last Active</span>
+
+                {% if recent_activity is defined and recent_activity %}
+                    <small class="badge violet">Active</small>
+                {% endif %}
+            </div>
+
+            <h2>{{ last_active if last_active is defined else "Today" }}</h2>
+        </div>
+
+    </section>
+
+    <section class="quick-actions">
+        <h2>Quick Actions</h2>
+
+        <div class="quick-actions-grid">
+
+            <a href="{{ url_for('main_bp.index') }}" class="action-card blue-card">
+                <div class="action-icon blue">
+                    <i class="fas fa-ship"></i>
+                </div>
+
+                <div>
+                    <h3>
+                        Make Prediction
+                        <span>&rarr;</span>
+                    </h3>
+                    <p>Predict passenger survival</p>
+                </div>
+            </a>
+
+            <a href="{{ url_for('main_bp.index') }}" class="action-card teal-card">
+                <div class="action-icon teal">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+
+                <div>
+                    <h3>
+                        Train Model
+                        <span>&rarr;</span>
+                    </h3>
+                    <p>Configure perceptron training</p>
+                </div>
+            </a>
+
+            <a href="{{ url_for('main_bp.index') }}" class="action-card purple-card">
+                <div class="action-icon purple">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+
+                <div>
+                    <h3>
+                        View Results
+                        <span>&rarr;</span>
+                    </h3>
+                    <p>See metrics and history</p>
+                </div>
+            </a>
+
+        </div>
+    </section>
+
+    <section class="bottom-grid">
+
+        <div class="activity-card">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-history"></i>
+                    <h2>Recent Activity</h2>
+                </div>
+
+                <p>Your latest actions and results</p>
+            </div>
+
+            <div class="activity-list">
+                {% if recent_activity is defined and recent_activity %}
+                    {% for activity in recent_activity %}
+                        <div class="activity-item">
+
+                            <div class="activity-left">
+                                <div class="activity-icon {% if activity.status == 'success' %}success{% else %}info{% endif %}">
+
+                                    {% if activity.type == 'prediction' %}
+                                        <i class="fas fa-life-ring"></i>
+                                    {% elif activity.type == 'training' %}
+                                        <i class="fas fa-chart-line"></i>
+                                    {% elif activity.type == 'analysis' %}
+                                        <i class="fas fa-database"></i>
+                                    {% else %}
+                                        <i class="fas fa-check"></i>
+                                    {% endif %}
+                                </div>
+
+                                <div>
+                                    <h4>{{ activity.title }}</h4>
+                                    <span>{{ activity.description }}</span>
+                                </div>
+                            </div>
+
+                            <small>{{ activity.time }}</small>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-activity">
+                        <i class="fas fa-inbox"></i>
+                        <p>No recent activity yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <a href="{{ url_for('main_bp.index') }}" class="history-btn">
+                View All History
+                <span>&rarr;</span>
+            </a>
+        </div>
+
+        <div class="dataset-card">
+            <div class="section-title">
+                <i class="fas fa-users"></i>
+                <h2>Dataset Info</h2>
+            </div>
+
+            <div class="dataset-stats">
+                <div>
+                    <h3>{{ training_samples if training_samples is defined else 891 }}</h3>
+                    <p>Training Samples</p>
+                </div>
+
+                <div>
+                    <h3>{{ test_samples if test_samples is defined else 418 }}</h3>
+                    <p>Test Samples</p>
+                </div>
+
+                <div>
+                    <h3>
+                        {% if survival_rate is defined and survival_rate is not none %}
+                            {{ "%.1f"|format(survival_rate) }}%
+                        {% else %}
+                            38.4%
+                        {% endif %}
+                    </h3>
+                    <p>Survival Rate</p>
+                </div>
+            </div>
+
+            <hr>
+
+            <a href="{{ url_for('main_bp.about') }}" class="learn-more-btn">
+                Learn More
+            </a>
+        </div>
+
+    </section>
+</section>
+{% endblock %}

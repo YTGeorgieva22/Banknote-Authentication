@@ -1,5 +1,5 @@
 from flask import render_template, redirect, url_for, flash
-
+from flask_login import login_user, logout_user, login_required, current_user
 from . import auth_bp
 from .forms import LoginForm, RegisterForm
 from .models import User
@@ -8,26 +8,27 @@ from flask import render_template, redirect, url_for, flash, session
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('main_bp.dashboard'))
+
     form = LoginForm()
 
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
-        print("entered username:", form.username.data)
-        print("entered password:", form.password.data)
-        print("db user:", user)
-        if user:
-            print("stored password:", user.password)
+
         if user and user.password == form.password.data:
-            session['user_id'] = user.id
-            session['username'] = user.username
-            return redirect(url_for('main_bp.home'))
-        else:
-            flash('Invalid username or password', 'danger')
+            login_user(user)
+            return redirect(url_for('main_bp.dashboard'))
+
+        flash('Invalid username or password', 'danger')
 
     return render_template('login.html', form=form)
 
+
 @auth_bp.route('/logout')
+@login_required
 def logout():
+    logout_user()
     session.clear()
     return redirect(url_for('auth.login'))
 

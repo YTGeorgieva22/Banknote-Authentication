@@ -1,222 +1,72 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>{% block title %}Titanic Survival Prediction{% endblock %}</title>
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    >
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #eef2f7;
-            color: #0f172a;
-            overflow-x: hidden;
-        }
-
-        .navbar {
-            width: 100%;
-            height: 74px;
-            background: rgba(255, 255, 255, 0.95);
-            border-bottom: 1px solid #e2e8f0;
-            backdrop-filter: blur(12px);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .navbar-container {
-            max-width: 1280px;
-            height: 100%;
-            margin: 0 auto;
-            padding: 0 34px;
-
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .navbar-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-            color: #2563eb;
-            font-size: 1.75rem;
-            font-weight: 800;
-            letter-spacing: -0.02em;
-        }
-
-        .navbar-brand-icon {
-            width: 42px;
-            height: 42px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .navbar-brand-icon img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        .navbar-center {
-            display: flex;
-            align-items: center;
-            gap: 42px;
-        }
-
-        .navbar-center a {
-            position: relative;
-            text-decoration: none;
-            color: #475569;
-            font-size: 1rem;
-            font-weight: 600;
-            transition: color 0.25s ease;
-        }
-
-        .navbar-center a:hover,
-        .navbar-center a.active {
-            color: #2563eb;
-        }
-
-        .navbar-center a::after {
-            content: "";
-            position: absolute;
-            left: 0;
-            bottom: -6px;
-            width: 0;
-            height: 2px;
-            background: #2563eb;
-            border-radius: 999px;
-            transition: width 0.25s ease;
-        }
-
-        .navbar-center a:hover::after,
-        .navbar-center a.active::after {
-            width: 100%;
-        }
-
-        .navbar-right {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .login-link {
-            text-decoration: none;
-            color: #111827;
-            font-size: 0.96rem;
-            font-weight: 700;
-            padding: 10px 14px;
-            border-radius: 10px;
-            transition: background 0.25s ease, color 0.25s ease;
-        }
-
-        .login-link:hover {
-            background: #f1f5f9;
-            color: #2563eb;
-        }
-
-        .register-btn {
-            text-decoration: none;
-            background: #020617;
-            color: #fff;
-            padding: 12px 20px;
-            border-radius: 12px;
-            font-size: 0.95rem;
-            font-weight: 700;
-            transition: all 0.25s ease;
-            box-shadow: 0 10px 20px rgba(2, 6, 23, 0.12);
-        }
-
-        .register-btn:hover {
-            background: #111827;
-            transform: translateY(-2px);
-            box-shadow: 0 16px 30px rgba(2, 6, 23, 0.18);
-        }
-
-        .page-content {
-            width: 100%;
-        }
-
-        @media (max-width: 900px) {
-            .navbar-container {
-                padding: 0 20px;
-            }
-
-            .navbar-center {
-                gap: 22px;
-            }
-
-            .navbar-brand {
-                font-size: 1.25rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .navbar {
-                height: auto;
-                padding: 14px 0;
-            }
-
-            .navbar-container {
-                flex-direction: column;
-                gap: 16px;
-            }
-
-            .navbar-center {
-                order: 3;
-            }
-
-            .navbar-right {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-    </style>
-</head>
-
+<link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
 <body>
 
 <nav class="navbar">
     <div class="navbar-container">
 
         <a class="navbar-brand" href="{{ url_for('main_bp.index') }}">
-            <div class="navbar-brand-icon">
-                <img src="{{ url_for('static', filename='logo.png') }}" alt="Titanic Logo">
-            </div>
-
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Titanic Logo">
             <span>Titanic Predictor</span>
         </a>
 
-        <div class="navbar-center">
-            <a class="active" href="{{ url_for('main_bp.index') }}">Home</a>
-             <a class="active" href="{{ url_for('main_bp.about') }}">About</a>
-        </div>
+        {% if current_user.is_authenticated %}
 
-        <div class="navbar-right">
-            <a class="login-link" href="{{ url_for('auth.login') }}">Login</a>
-            <a class="register-btn" href="{{ url_for('auth.register') }}">Register</a>
-        </div>
+            <div class="navbar-center logged-nav">
+                <a href="{{ url_for('main_bp.index') }}"
+                   class="{% if request.endpoint == 'main_bp.index' %}active{% endif %}">
+                    Home
+                </a>
+
+                <a href="{{ url_for('main_bp.about') }}"
+                   class="{% if request.endpoint == 'main_bp.about' %}active{% endif %}">
+                    About
+                </a>
+
+                <a href="{{ url_for('main_bp.dashboard') }}"
+                   class="{% if request.endpoint == 'main_bp.dashboard' %}active{% endif %}">
+                    Dashboard
+                </a>
+
+                <a href="{{ url_for('main_bp.index') }}">Predict</a>
+                <a href="{{ url_for('main_bp.index') }}">Train Model</a>
+                <a href="{{ url_for('main_bp.index') }}">Results</a>
+            </div>
+
+            <div class="navbar-right logged-user">
+                <span class="user-greeting">
+                    Hi, {{ current_user.username }}
+                </span>
+
+                <a class="logout-btn" href="{{ url_for('auth.logout') }}">
+                    Logout
+                </a>
+            </div>
+
+        {% else %}
+
+            <div class="navbar-center">
+                <a href="{{ url_for('main_bp.index') }}"
+                   class="{% if request.endpoint == 'main_bp.index' %}active{% endif %}">
+                    Home
+                </a>
+
+                <a href="{{ url_for('main_bp.about') }}"
+                   class="{% if request.endpoint == 'main_bp.about' %}active{% endif %}">
+                    About
+                </a>
+            </div>
+
+            <div class="navbar-right">
+                <a class="login-link" href="{{ url_for('auth.login') }}">
+                    Login
+                </a>
+
+                <a class="register-btn" href="{{ url_for('auth.register') }}">
+                    Register
+                </a>
+            </div>
+
+        {% endif %}
 
     </div>
 </nav>
@@ -226,4 +76,3 @@
 </div>
 
 </body>
-</html>
