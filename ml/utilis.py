@@ -1,5 +1,3 @@
-# app/ml/utils.py
-
 import csv
 import random
 
@@ -7,7 +5,7 @@ import random
 def safe_float(value, default=0.0):
     try:
         return float(value)
-    except:
+    except Exception:
         return default
 
 
@@ -23,7 +21,7 @@ def encode_embarked(value):
         return 1.0
     elif value == "Q":
         return 2.0
-    return 0.0  # S or missing
+    return 0.0
 
 
 def read_csv_rows(file_path):
@@ -65,28 +63,28 @@ def row_to_features(row, mean_age, mean_fare):
         embarked_value = "S"
 
     features = [
-        float(row["Pclass"]),              # passenger class
-        encode_sex(row["Sex"]),            # male/female
-        age,                               # age
-        float(row["SibSp"]),               # siblings/spouses
-        float(row["Parch"]),               # parents/children
-        fare,                              # fare
-        encode_embarked(embarked_value)    # embarked port
+        float(row["Pclass"]),
+        encode_sex(row["Sex"]),
+        age,
+        float(row["SibSp"]),
+        float(row["Parch"]),
+        fare,
+        encode_embarked(embarked_value)
     ]
 
     return features
 
 
-def standardize_train_test(X_train, X_test):
-    if not X_train:
-        return X_train, X_test
+def standardize_fit(X):
+    if not X:
+        return [], [], []
 
-    n_features = len(X_train[0])
+    n_features = len(X[0])
     means = []
     stds = []
 
     for j in range(n_features):
-        column = [row[j] for row in X_train]
+        column = [row[j] for row in X]
         mean = sum(column) / len(column)
 
         variance = 0.0
@@ -101,17 +99,21 @@ def standardize_train_test(X_train, X_test):
         means.append(mean)
         stds.append(std)
 
-    def transform(X):
-        result = []
-        for row in X:
-            new_row = []
-            for j in range(n_features):
-                new_value = (row[j] - means[j]) / stds[j]
-                new_row.append(new_value)
-            result.append(new_row)
-        return result
+    X_scaled = standardize_apply(X, means, stds)
+    return X_scaled, means, stds
 
-    return transform(X_train), transform(X_test)
+
+def standardize_apply(X, means, stds):
+    result = []
+
+    for row in X:
+        new_row = []
+        for j in range(len(row)):
+            new_value = (row[j] - means[j]) / stds[j]
+            new_row.append(new_value)
+        result.append(new_row)
+
+    return result
 
 
 def load_training_data(file_path, test_size=0.2, seed=42):
@@ -136,15 +138,30 @@ def load_training_data(file_path, test_size=0.2, seed=42):
     train_part = combined[:split_index]
     val_part = combined[split_index:]
 
-    X_train = [item[0] for item in train_part]
+    X_train_raw = [item[0] for item in train_part]
     y_train = [item[1] for item in train_part]
 
-    X_val = [item[0] for item in val_part]
+    X_val_raw = [item[0] for item in val_part]
     y_val = [item[1] for item in val_part]
 
-    X_train, X_val = standardize_train_test(X_train, X_val)
+    X_train, means, stds = standardize_fit(X_train_raw)
+    X_val = standardize_apply(X_val_raw, means, stds)
 
-    return X_train, y_train, X_val, y_val
+    return X_train, y_train, X_val, y_val, means, stds, mean_age, mean_fare
+
+
+def prepare_single_input(form_data, mean_age, mean_fare):
+    row = {
+        "Pclass": str(form_data["pclass"]),
+        "Sex": str(form_data["sex"]),
+        "Age": str(form_data["age"]) if str(form_data["age"]).strip() != "" else str(mean_age),
+        "SibSp": str(form_data["sibsp"]),
+        "Parch": str(form_data["parch"]),
+        "Fare": str(form_data["fare"]) if str(form_data["fare"]).strip() != "" else str(mean_fare),
+        "Embarked": str(form_data["embarked"]) if str(form_data["embarked"]).strip() != "" else "S",
+    }
+
+    return row_to_features(row, mean_age, mean_fare)
 
 
 def load_test_data(file_path, train_file_path):
@@ -161,12 +178,12 @@ def load_test_data(file_path, train_file_path):
         features = row_to_features(row, mean_age, mean_fare)
         X_test.append(features)
 
-    # standardize test data using statistics from training-style transformation
     X_train_raw = []
     for row in train_rows:
         X_train_raw.append(row_to_features(row, mean_age, mean_fare))
 
-    X_train_scaled, X_test_scaled = standardize_train_test(X_train_raw, X_test)
+    _, means, stds = standardize_fit(X_train_raw)
+    X_test_scaled = standardize_apply(X_test, means, stds)
 
     return passenger_ids, X_test_scaled
 

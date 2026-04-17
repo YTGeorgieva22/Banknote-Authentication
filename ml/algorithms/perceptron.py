@@ -4,11 +4,8 @@ class Perceptron:
         self.epochs = epochs
         self.threshold = threshold
 
-        # model parameters
         self.weights = [0.0 for _ in range(n_features)]
         self.bias = 0.0
-
-        # to show training through epochs
         self.epoch_errors = []
 
     def weighted_sum(self, x):
@@ -18,7 +15,6 @@ class Perceptron:
         return total
 
     def activation(self, x):
-        # binary classification output: 0 or 1
         return 1 if self.weighted_sum(x) >= self.threshold else 0
 
     def predict_one(self, x):
@@ -31,7 +27,9 @@ class Perceptron:
         return predictions
 
     def fit(self, X, y):
-        for epoch in range(self.epochs):
+        self.epoch_errors = []
+
+        for _ in range(self.epochs):
             errors = 0
 
             for i in range(len(X)):
@@ -44,7 +42,6 @@ class Perceptron:
                 if update != 0:
                     errors += 1
 
-                # weight update rule
                 for j in range(len(self.weights)):
                     self.weights[j] += update * x_i[j]
 

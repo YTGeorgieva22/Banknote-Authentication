@@ -1,44 +1,49 @@
-from ml.algorithms.perceptron import Perceptron
-from ml.utilis import load_training_data
+import os
 
-# load and train once
-X_train, y_train, X_val, y_val = load_training_data("train.csv")
+from ml.algorithms.perceptron import (Perceptron)
+from ml.utilis import load_training_data, prepare_single_input, standardize_apply
 
-model = Perceptron(
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+TRAIN_FILE_PATH = os.path.join(BASE_DIR, "train.csv")
+
+X_train, y_train, X_val, y_val, FEATURE_MEANS, FEATURE_STDS, DATA_MEAN_AGE, DATA_MEAN_FARE = load_training_data(TRAIN_FILE_PATH)
+
+perceptron = Perceptron(
     n_features=len(X_train[0]),
     learning_rate=0.01,
-    epochs=30,
-    threshold=0.0
+    epochs=50
 )
+perceptron.fit(X_train, y_train)
 
-model.fit(X_train, y_train)
 
+def predict_passenger(form_data):
+    raw_features = prepare_single_input(
+        form_data=form_data,
+        mean_age=DATA_MEAN_AGE,
+        mean_fare=DATA_MEAN_FARE
+    )
+
+    scaled_features = standardize_apply([raw_features], FEATURE_MEANS, FEATURE_STDS)
+    features = scaled_features[0]
+
+    result = perceptron.predict([features])[0]
+    score = perceptron.weighted_sum(features)
+
+    return result, score
 
 def get_perceptron_results():
-    predictions = model.predict(X_val)
-    accuracy = model.accuracy(X_val, y_val)
-    confusion_matrix = model.confusion_matrix(X_val, y_val)
+    accuracy = perceptron.accuracy(X_val, y_val)
+    confusion = perceptron.confusion_matrix(X_val, y_val)
 
-    comparison = []
-    for i in range(min(10, len(y_val))):
-        comparison.append({
-            "index": i + 1,
-            "predicted": predictions[i],
-            "actual": y_val[i]
-        })
+    comparison = {
+        "perceptron": round(accuracy * 100, 2),
+        "baseline": 61.6,  # majority class baseline for Titanic
+        "target": 80.0
+    }
 
     return {
         "accuracy": accuracy,
-        "confusion_matrix": confusion_matrix,
-        "epoch_errors": model.epoch_errors,
+        "epoch_errors": perceptron.epoch_errors,
+        "confusion_matrix": confusion,
         "comparison": comparison
-    }
-
-
-def predict_passenger(features):
-    prediction = model.predict_one(features)
-
-    return {
-        "prediction": prediction,
-        "label": "Survived" if prediction == 1 else "Did Not Survive"
     }

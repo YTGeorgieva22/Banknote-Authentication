@@ -1,11 +1,11 @@
+import numpy as np
 from flask_login import current_user, login_required
 from flask import Blueprint, render_template, redirect, url_for,request
 from __init__ import db
 from auth.models import ModelTraining, Prediction
-from ml.service import get_perceptron_results
-from ml.service import predict_passenger
 from . import main_bp
-
+import math
+from ml.service import predict_passenger,get_perceptron_results
 @main_bp.route('/', methods=['GET', 'POST'])
 def index():
     return render_template('index.html', current_user=current_user)
@@ -101,11 +101,27 @@ def predict():
     confidence = None
 
     if request.method == 'POST':
-        # your prediction logic here
-        prediction = "Likely Survived"
-        survived = True
-        probability = 90.0
-        confidence = 85.2
+        form_data = {
+            "pclass": request.form['pclass'],
+            "sex": request.form['sex'],
+            "age": request.form['age'],
+            "sibsp": request.form['sibsp'],
+            "parch": request.form['parch'],
+            "fare": request.form['fare'],
+            "embarked": request.form['embarked'],
+        }
+
+        result, score = predict_passenger(form_data)
+
+        probability = round(100 / (1 + math.exp(-score)), 1)
+        confidence = round(max(probability, 100 - probability), 1)
+
+        if result == 1:
+            prediction = "Likely Survived"
+            survived = True
+        else:
+            prediction = "Likely Did Not Survive"
+            survived = False
 
     return render_template(
         'predict.html',
