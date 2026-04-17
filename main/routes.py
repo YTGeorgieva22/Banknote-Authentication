@@ -130,3 +130,46 @@ def predict():
         probability=probability,
         confidence=confidence
     )
+
+@main_bp.route('/train', methods=['GET', 'POST'])
+@login_required
+def train_model():
+    trained = False
+    accuracy = None
+
+    learning_rate = 0.010
+    epochs = 100
+    test_size = 0.20
+
+    if request.method == 'POST':
+        learning_rate = float(request.form['learning_rate'])
+        epochs = int(request.form['epochs'])
+        test_size = float(request.form['test_size'])
+
+        from ml.algorithms.perceptron import Perceptron
+        from ml.utilis import load_training_data
+
+        X_train, y_train, X_val, y_val, _, _, _, _ = load_training_data(
+            "train.csv",
+            test_size=test_size
+        )
+
+        model = Perceptron(
+            n_features=len(X_train[0]),
+            learning_rate=learning_rate,
+            epochs=epochs
+        )
+
+        model.fit(X_train, y_train)
+
+        accuracy = round(model.accuracy(X_val, y_val) * 100, 2)
+        trained = True
+
+    return render_template(
+        'train.html',
+        trained=trained,
+        accuracy=accuracy,
+        learning_rate=learning_rate,
+        epochs=epochs,
+        test_size=test_size
+    )

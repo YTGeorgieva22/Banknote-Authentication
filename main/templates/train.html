@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='train.css') }}">
+
+<div class="train-page">
+    <div class="train-container">
+
+        <!-- Header -->
+        <div class="train-header">
+            <div class="train-header-icon">
+                <i class="bi bi-lightning-charge"></i>
+            </div>
+
+            <div>
+                <h1 class="train-title">Train Perceptron Model</h1>
+                <p class="train-subtitle">
+                    Configure hyperparameters and train a perceptron on Titanic data
+                </p>
+            </div>
+        </div>
+
+        <div class="train-layout">
+
+            <!-- Left -->
+            <div class="train-main-card">
+                <div class="card-head">
+                    <h2>
+                        <i class="bi bi-gear me-2"></i>
+                        Model Configuration
+                    </h2>
+                    <p>Adjust hyperparameters for perceptron training</p>
+                </div>
+
+                <form method="POST">
+                    <div class="config-group">
+                        <div class="config-top">
+                            <label for="learning_rate">Learning Rate (η)</label>
+                            <span id="lr-value">{{ learning_rate|default(0.010) }}</span>
+                        </div>
+
+                        <input type="range"
+                               id="learning_rate"
+                               name="learning_rate"
+                               min="0.001"
+                               max="0.1"
+                               step="0.001"
+                               value="{{ learning_rate|default(0.010) }}"
+                               class="range-input"
+                               oninput="document.getElementById('lr-value').innerText = parseFloat(this.value).toFixed(3)">
+                        <small>
+                            Controls weight update magnitude in perceptron learning rule
+                        </small>
+                    </div>
+
+                    <div class="config-group">
+                        <label for="epochs">Number of Epochs</label>
+
+                        <input type="number"
+                               id="epochs"
+                               name="epochs"
+                               min="10"
+                               max="1000"
+                               value="{{ epochs|default(100) }}"
+                               class="text-input">
+
+                        <small>
+                            Number of complete passes through the training dataset (10-1000)
+                        </small>
+                    </div>
+
+                    <div class="config-group">
+                        <div class="config-top">
+                            <label for="test_size">Test Set Size</label>
+                            <span id="test-value">{{ (test_size|default(0.2) * 100)|int }}%</span>
+                        </div>
+
+                        <input type="range"
+                               id="test_size"
+                               name="test_size"
+                               min="0.1"
+                               max="0.5"
+                               step="0.05"
+                               value="{{ test_size|default(0.2) }}"
+                               class="range-input"
+                               oninput="document.getElementById('test-value').innerText = Math.round(this.value * 100) + '%'">
+
+                        <small>
+                            Percentage of data reserved for testing and validation
+                        </small>
+                    </div>
+
+                    <button type="submit" class="train-btn">
+                        <i class="bi bi-play-fill me-2"></i>
+                        Start Training
+                    </button>
+                </form>
+
+                {% if trained %}
+                <div class="training-result">
+                    <div class="training-result-header">
+                        <div class="result-icon">
+                            <i class="bi bi-check-lg"></i>
+                        </div>
+
+                        <div>
+                            <h3>Training Complete</h3>
+                            <p>Perceptron model successfully trained</p>
+                        </div>
+                    </div>
+
+                    <div class="metrics-grid">
+                        <div class="metric-box">
+                            <span class="metric-label">Accuracy</span>
+                            <span class="metric-value">{{ accuracy }}%</span>
+                        </div>
+
+                        <div class="metric-box">
+                            <span class="metric-label">Epochs</span>
+                            <span class="metric-value">{{ epochs }}</span>
+                        </div>
+
+                        <div class="metric-box">
+                            <span class="metric-label">Learning Rate</span>
+                            <span class="metric-value">{{ learning_rate }}</span>
+                        </div>
+
+                        <div class="metric-box">
+                            <span class="metric-label">Test Size</span>
+                            <span class="metric-value">{{ (test_size * 100)|int }}%</span>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Right -->
+            <div class="train-sidebar">
+
+                <div class="sidebar-card">
+                    <h3>
+                        <i class="bi bi-info-circle me-2"></i>
+                        Training Info
+                    </h3>
+
+                    <div class="info-section">
+                        <h4>Dataset</h4>
+                        <p>Titanic Passenger Data</p>
+                        <small>891 training samples</small>
+                    </div>
+
+                    <div class="info-section">
+                        <h4>Algorithm</h4>
+                        <p>Perceptron</p>
+                        <small>Binary classification</small>
+                    </div>
+
+                    <div class="info-section">
+                        <h4>Features Used</h4>
+                        <ul>
+                            <li>Passenger Class</li>
+                            <li>Sex (Gender)</li>
+                            <li>Age</li>
+                            <li>Siblings/Spouses</li>
+                            <li>Parents/Children</li>
+                            <li>Fare</li>
+                            <li>Embarkation Port</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="sidebar-card tips-card">
+                    <h3>
+                        <i class="bi bi-anchor me-2"></i>
+                        Training Tips
+                    </h3>
+
+                    <ul class="tips-list">
+                        <li>Start with default parameters</li>
+                        <li>Increase epochs for better convergence</li>
+                        <li>Higher learning rate = faster but less stable</li>
+                        <li>Keep test size between 15-30%</li>
+                        <li>Perceptron works best on linearly separable data</li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
