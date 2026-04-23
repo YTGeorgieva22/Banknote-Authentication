@@ -4,7 +4,7 @@ from ml.algorithms.perceptron import (Perceptron)
 from ml.utilis import load_training_data, prepare_single_input, standardize_apply
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-TRAIN_FILE_PATH = os.path.join(BASE_DIR, "train.csv")
+TRAIN_FILE_PATH = os.path.join(BASE_DIR, "data/train.csv")
 
 X_train, y_train, X_val, y_val, FEATURE_MEANS, FEATURE_STDS, DATA_MEAN_AGE, DATA_MEAN_FARE = load_training_data(TRAIN_FILE_PATH)
 

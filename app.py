@@ -1,4 +1,3 @@
-from flask import Flask
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager
 
