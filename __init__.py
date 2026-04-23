@@ -9,6 +9,9 @@ def create_app(config):
     db.init_app(app)
     from main import main_bp
     app.register_blueprint(main_bp)
+    from errors import errors_bp
+
+    app.register_blueprint(errors_bp)
     from auth import auth_bp
     app.register_blueprint(auth_bp)
     return app

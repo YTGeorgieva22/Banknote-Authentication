@@ -321,3 +321,7 @@ def results():
         history=history,
         decision_formula=decision_formula
     )
+
+@main_bp.route("/test-500")
+def test_500():
+    return 1 / 0 
